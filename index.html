@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weathering Design Challenge</title>
+<style>
+  :root{
+    --ink:#1c2430; --muted:#5a6572; --accent:#0b5cad; --accent-dark:#084a8a;
+    --card:#ffffff; --bg:#eef2f6; --line:#d4dce4; --soft:#f4f8fc;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;}
+  .wrap{max-width:820px;margin:0 auto;padding:16px 14px 48px;}
+  header{margin:10px 0 14px;}
+  h1{font-size:1.7rem;margin:0 0 4px;}
+  h2{font-size:1.15rem;margin:0 0 8px;}
+  .subtitle{color:var(--muted);font-size:1rem;margin:0 0 10px;}
+  .intro{font-size:1.02rem;margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px;margin:14px 0;box-shadow:0 1px 3px rgba(20,40,60,.06);}
+  .helper{color:var(--muted);font-size:.95rem;margin:0 0 10px;}
+  .prompt{margin:0 0 18px;}
+  .prompt:last-child{margin-bottom:0;}
+  .prompt label,.prompt legend{display:block;font-weight:600;margin:0 0 6px;padding:0;}
+  fieldset{border:0;margin:0 0 18px;padding:0;}
+  .prompt textarea,.prompt input[type=text],.mat-row input[type=text]{
+    width:100%;padding:10px 12px;font:inherit;font-size:1rem;
+    border:1px solid var(--line);border-radius:8px;}
+  .prompt textarea{min-height:90px;resize:vertical;}
+  textarea:focus-visible,input:focus-visible,button:focus-visible,.chip:focus-visible,
+  .swatch:focus-visible{outline:3px solid #f2b01e;outline-offset:2px;}
+  .criteria{list-style:none;margin:0;padding:0;}
+  .criteria li{margin:0 0 10px;}
+  .criteria label{display:flex;gap:10px;align-items:flex-start;font-weight:500;cursor:pointer;}
+  .criteria input[type=checkbox]{width:22px;height:22px;flex:0 0 auto;margin-top:2px;accent-color:var(--accent);}
+  .mat-row{display:flex;gap:8px;align-items:center;margin:0 0 8px;}
+  .mat-row input[type=text]{flex:1;}
+  button{cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:#fff;
+    padding:9px 16px;border-radius:8px;min-height:44px;font-weight:600;font:inherit;}
+  button:hover{background:var(--accent-dark);}
+  button.secondary{background:#fff;color:var(--accent);}
+  button.secondary:hover{background:var(--soft);}
+  button.smallbtn{min-height:40px;padding:6px 12px;font-weight:500;}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 0;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{cursor:pointer;font:inherit;border:1px solid var(--accent);background:#fff;color:var(--accent);
+    padding:8px 14px;border-radius:999px;min-height:44px;font-weight:600;}
+  .chip:hover{background:var(--soft);}
+  .chip[aria-pressed="true"]{background:var(--accent);color:#fff;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;}
+  .toolbar .group{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .toolbar .tlabel{font-size:.9rem;color:var(--muted);font-weight:600;}
+  .swatch{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);padding:0;min-height:34px;}
+  .swatch[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink);}
+  .toolbtn[aria-pressed="true"]{background:var(--accent);color:#fff;}
+  canvas.pad{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);
+    border-radius:8px;touch-action:none;}
+  .photo-preview{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin-top:10px;}
+  input[type=file]{font:inherit;padding:8px 0;}
+  .hidden{display:none !important;}
+  .answer{margin:0 0 18px;}
+  .answer h3{font-size:1rem;margin:0 0 4px;}
+  .answer p{margin:0;white-space:pre-wrap;}
+  .answer ul{margin:0;padding-left:20px;}
+  .answer img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;}
+  .answer p.blank{color:var(--muted);font-style:italic;}
+  .plan-criteria{list-style:none;margin:0;padding:0;}
+  .plan-criteria li{margin:0 0 6px;}
+  .copied{font-weight:600;color:#177245;min-height:1.3em;margin:10px 0 0;}
+  .note{color:var(--muted);font-size:.95rem;}
+  @media (max-width:680px){h1{font-size:1.4rem;}}
+  @media print{
+    body{background:#fff;}
+    .noprint{display:none !important;}
+    .card{box-shadow:none;border-color:#999;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Weathering Design Challenge</h1>
+<p class="subtitle">Grade 7 STEAM, Explore the Land, Lesson 4 Extension</p>
+<p class="intro">An engineering design challenge: protect a wind chime from a winter of weathering, using only materials you already have at home.</p>
+</header>
+<main>
+<section id="formView" aria-label="Design challenge steps">
+
+<div class="card">
+<h2>Imagine</h2>
+<p>The end of summer is approaching. You gaze at the beautiful metal and glass wind chime you spent many warm evenings listening to, when suddenly a thought pops into your head.</p>
+<p>What if your beloved wind chime experiences the effects of weathering, like the rocks you recently learned about? You could take it in for the winter, but it was so much work attaching it to a wire high up on the eave of your house.</p>
+<p><strong>Could you design and create a protective case to cover it?</strong></p>
+</div>
+
+<div class="card">
+<h2>Your challenge</h2>
+<p>Create a protective covering for a glass and metal wind chime. Design against this checklist, and tick each box when your design covers it:</p>
+<ul class="criteria" id="criteriaList">
+<li><label><input type="checkbox" data-criterion="Protects the wind chime from snow, ice, and rain"> Protects the wind chime from snow, ice, and rain</label></li>
+<li><label><input type="checkbox" data-criterion="Protects it from small rocks and sand carried by high winds"> Protects it from small rocks and sand carried by high winds</label></li>
+<li><label><input type="checkbox" data-criterion="Takes into account the chime swinging and hitting the house in high wind"> Takes into account the chime swinging and hitting the house in high wind</label></li>
+<li><label><input type="checkbox" data-criterion="Made only from recycled or repurposed materials found around home"> Made only from recycled or repurposed materials found around home</label></li>
+<li><label><input type="checkbox" data-criterion="Has a fastening system so the cover can be taken off and put back on easily"> Has a fastening system so the cover can be taken off and put back on easily</label></li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Step 1: Brainstorm and sketch</h2>
+<p class="helper">Sketch your idea for the cover. You can draw with the pen tools, write notes, or do both.</p>
+<div class="toolbar" data-toolbar="sketch">
+<span class="tlabel">Colour:</span>
+<span class="group" data-swatches></span>
+<span class="tlabel">Pen:</span>
+<span class="group">
+<button type="button" class="secondary smallbtn toolbtn" data-width="3">Thin</button>
+<button type="button" class="secondary smallbtn toolbtn" data-width="7" aria-pressed="true">Medium</button>
+<button type="button" class="secondary smallbtn toolbtn" data-width="14">Thick</button>
+</span>
+<span class="group">
+<button type="button" class="secondary smallbtn" data-act="undo">Undo</button>
+<button type="button" class="secondary smallbtn" data-act="clear">Clear</button>
+</span>
+</div>
+<canvas id="sketchPad" class="pad" width="880" height="540" role="img" aria-label="Drawing canvas for your brainstorm sketch"></canvas>
+<div class="prompt" style="margin-top:14px;">
+<label for="sketchNotes">My brainstorm notes</label>
+<textarea id="sketchNotes" rows="3"></textarea>
+</div>
+</div>
+
+<div class="card">
+<h2>Step 2: Materials</h2>
+<p class="helper">Decide on the recycled or repurposed materials you will use, and list them here. One material per row.</p>
+<div id="matList"></div>
+<div class="btnrow noprint">
+<button type="button" class="secondary smallbtn" id="addMat">Add another material</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Step 3: My prototype</h2>
+<p class="helper">Build a prototype of your design. Then show it here: add a photo of your prototype, or draw a labelled diagram of it.</p>
+<fieldset data-chips="protoMode">
+<legend>How will you show your prototype?</legend>
+<div class="chips" role="group" aria-label="Choose how to show your prototype">
+<button type="button" class="chip" data-value="photo" aria-pressed="false">Add a photo</button>
+<button type="button" class="chip" data-value="diagram" aria-pressed="false">Draw a diagram</button>
+</div>
+</fieldset>
+<div id="photoBlock" class="hidden">
+<label for="protoPhoto"><strong>Photo of my prototype</strong></label><br>
+<input type="file" id="protoPhoto" accept="image/*">
+<img id="photoPreview" class="photo-preview hidden" alt="Your prototype photo">
+<p class="note">Your photo is only shown on this page. It is not uploaded anywhere.</p>
+</div>
+<div id="diagramBlock" class="hidden">
+<div class="toolbar" data-toolbar="diagram">
+<span class="tlabel">Colour:</span>
+<span class="group" data-swatches></span>
+<span class="tlabel">Pen:</span>
+<span class="group">
+<button type="button" class="secondary smallbtn toolbtn" data-width="3">Thin</button>
+<button type="button" class="secondary smallbtn toolbtn" data-width="7" aria-pressed="true">Medium</button>
+<button type="button" class="secondary smallbtn toolbtn" data-width="14">Thick</button>
+</span>
+<span class="group">
+<button type="button" class="secondary smallbtn" data-act="undo">Undo</button>
+<button type="button" class="secondary smallbtn" data-act="clear">Clear</button>
+</span>
+</div>
+<canvas id="diagramPad" class="pad" width="880" height="540" role="img" aria-label="Drawing canvas for your labelled prototype diagram"></canvas>
+<div class="prompt" style="margin-top:14px;">
+<label for="diagramLabels">Labels for my diagram: list what each part is</label>
+<textarea id="diagramLabels" rows="3"></textarea>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Step 4: Reflect</h2>
+<div class="prompt">
+<label for="reflectDiff">How did your prototype differ from your original design?</label>
+<textarea id="reflectDiff" rows="3"></textarea>
+</div>
+<div class="prompt">
+<label for="reflectImprove">What changes could you make to your prototype to improve it?</label>
+<textarea id="reflectImprove" rows="3"></textarea>
+</div>
+<fieldset data-chips="rating">
+<legend>Rate your design</legend>
+<div class="chips" role="group" aria-label="Rate your design from 1 to 5">
+<button type="button" class="chip" data-value="1" aria-pressed="false" aria-label="1: Needs improvement">1</button>
+<button type="button" class="chip" data-value="2" aria-pressed="false" aria-label="2">2</button>
+<button type="button" class="chip" data-value="3" aria-pressed="false" aria-label="3">3</button>
+<button type="button" class="chip" data-value="4" aria-pressed="false" aria-label="4">4</button>
+<button type="button" class="chip" data-value="5" aria-pressed="false" aria-label="5: Excellent">5</button>
+</div>
+<p class="helper" style="margin-top:8px;">1 is Needs improvement, 5 is Excellent.</p>
+</fieldset>
+</div>
+
+<div class="card">
+<h2>Step 5: Test it</h2>
+<p>You do not need an actual wind chime for the test. Place your design outside in a secure location and see how it does over the next few days. Then come back and record what happened.</p>
+<div class="prompt">
+<label for="testNotes">What I noticed in the test</label>
+<textarea id="testNotes" rows="3"></textarea>
+</div>
+<div class="btnrow noprint">
+<button type="button" id="seePlan">See my design plan</button>
+</div>
+<p class="note">Your work stays on this page. Nothing is sent anywhere, and nothing is saved online.</p>
+</div>
+
+</section>
+<section id="summaryView" class="card hidden" aria-label="Your design plan">
+<h2>My design plan</h2>
+<div id="answers"></div>
+<div class="btnrow noprint">
+<button type="button" id="printBtn">Print</button>
+<button type="button" id="copyBtn" class="secondary">Copy</button>
+<button type="button" id="backEdit" class="secondary">Back and edit</button>
+</div>
+<p id="copyNote" class="copied noprint" aria-live="polite"></p>
+</section>
+</main>
+</div>
+<script>
+var PALETTE = ["#1c2430", "#7a4a21", "#c0272d", "#e07b17", "#d9a404", "#2e8b3a", "#0b5cad", "#6d3ba3", "#d1528c", "#8d9aa8"];
+var state = { protoMode: "", rating: 0, photoDataUrl: "" };
+
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ---------- drawing pads ---------- */
+function makePad(canvasId) {
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  var pad = { canvas: canvas, ctx: ctx, strokes: [], color: PALETTE[0], width: 7, drawing: null };
+  function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    pad.strokes.forEach(function (s) { drawStroke(s); });
+  }
+  function drawStroke(s) {
+    if (!s.points.length) return;
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.width;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(s.points[0][0], s.points[0][1]);
+    if (s.points.length === 1) {
+      ctx.lineTo(s.points[0][0] + 0.01, s.points[0][1] + 0.01);
+    } else {
+      for (var i = 1; i < s.points.length; i++) ctx.lineTo(s.points[i][0], s.points[i][1]);
+    }
+    ctx.stroke();
+  }
+  function pos(e) {
+    var r = canvas.getBoundingClientRect();
+    var sx = canvas.width / (r.width || canvas.width);
+    var sy = canvas.height / (r.height || canvas.height);
+    return [(e.clientX - r.left) * sx, (e.clientY - r.top) * sy];
+  }
+  canvas.addEventListener("pointerdown", function (e) {
+    e.preventDefault();
+    if (canvas.setPointerCapture && e.pointerId !== undefined) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    pad.drawing = { color: pad.color, width: pad.width, points: [pos(e)] };
+    pad.strokes.push(pad.drawing);
+    redraw();
+  });
+  canvas.addEventListener("pointermove", function (e) {
+    if (!pad.drawing) return;
+    pad.drawing.points.push(pos(e));
+    redraw();
+  });
+  function endStroke() { pad.drawing = null; }
+  canvas.addEventListener("pointerup", endStroke);
+  canvas.addEventListener("pointercancel", endStroke);
+  pad.redraw = redraw;
+  pad.undo = function () { pad.strokes.pop(); redraw(); };
+  pad.clear = function () { pad.strokes = []; redraw(); };
+  pad.toData = function () { return canvas.toDataURL("image/png"); };
+  pad.hasDrawing = function () { return pad.strokes.length > 0; };
+  redraw();
+  return pad;
+}
+
+function setupToolbar(toolbarName, pad) {
+  var bar = document.querySelector("[data-toolbar=\"" + toolbarName + "\"]");
+  var swatchBox = bar.querySelector("[data-swatches]");
+  PALETTE.forEach(function (color, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "swatch";
+    b.style.background = color;
+    b.setAttribute("aria-label", "Pen colour " + color);
+    b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+    b.addEventListener("click", function () {
+      pad.color = color;
+      swatchBox.querySelectorAll(".swatch").forEach(function (s) { s.setAttribute("aria-pressed", "false"); });
+      b.setAttribute("aria-pressed", "true");
+    });
+    swatchBox.appendChild(b);
+  });
+  bar.querySelectorAll("[data-width]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      pad.width = parseInt(btn.getAttribute("data-width"), 10);
+      bar.querySelectorAll("[data-width]").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+      btn.setAttribute("aria-pressed", "true");
+    });
+  });
+  bar.querySelectorAll("[data-act]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (btn.getAttribute("data-act") === "undo") pad.undo(); else pad.clear();
+    });
+  });
+}
+
+var sketchPad = makePad("sketchPad");
+var diagramPad = makePad("diagramPad");
+setupToolbar("sketch", sketchPad);
+setupToolbar("diagram", diagramPad);
+
+/* ---------- materials list ---------- */
+function makeMatRow(value) {
+  var row = document.createElement("div");
+  row.className = "mat-row";
+  var input = document.createElement("input");
+  input.type = "text";
+  input.value = value || "";
+  input.setAttribute("aria-label", "One recycled or repurposed material");
+  var remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "secondary smallbtn noprint";
+  remove.textContent = "Remove";
+  remove.addEventListener("click", function () {
+    var list = document.getElementById("matList");
+    if (list.children.length > 1) row.remove(); else input.value = "";
+  });
+  row.appendChild(input);
+  row.appendChild(remove);
+  return row;
+}
+function addMat(value) { document.getElementById("matList").appendChild(makeMatRow(value)); }
+function collectMaterials() {
+  var out = [];
+  document.querySelectorAll("#matList input[type=text]").forEach(function (input) {
+    var v = input.value.trim();
+    if (v) out.push(v);
+  });
+  return out;
+}
+
+/* ---------- chips ---------- */
+function setupChips(groupName, onPick) {
+  var fieldset = document.querySelector("[data-chips=\"" + groupName + "\"]");
+  var chips = fieldset.querySelectorAll(".chip");
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var wasPressed = chip.getAttribute("aria-pressed") === "true";
+      chips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
+      var value = "";
+      if (!wasPressed) {
+        chip.setAttribute("aria-pressed", "true");
+        value = chip.getAttribute("data-value") || chip.textContent.trim();
+      }
+      onPick(value);
+    });
+  });
+}
+setupChips("protoMode", function (v) {
+  state.protoMode = v;
+  document.getElementById("photoBlock").classList.toggle("hidden", v !== "photo");
+  document.getElementById("diagramBlock").classList.toggle("hidden", v !== "diagram");
+});
+setupChips("rating", function (v) { state.rating = v ? parseInt(v, 10) : 0; });
+
+document.getElementById("protoPhoto").addEventListener("change", function (e) {
+  var file = e.target.files && e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    state.photoDataUrl = String(reader.result);
+    var img = document.getElementById("photoPreview");
+    img.src = state.photoDataUrl;
+    img.classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ---------- compile ---------- */
+var CRITERIA = [
+  "Protects the wind chime from snow, ice, and rain",
+  "Protects it from small rocks and sand carried by high winds",
+  "Takes into account the chime swinging and hitting the house in high wind",
+  "Made only from recycled or repurposed materials found around home",
+  "Has a fastening system so the cover can be taken off and put back on easily"
+];
+function collectCriteria() {
+  var out = [];
+  document.querySelectorAll("#criteriaList input[type=checkbox]").forEach(function (box, i) {
+    out.push({ text: CRITERIA[i], met: box.checked });
+  });
+  return out;
+}
+function ratingText() {
+  if (!state.rating) return "";
+  var t = state.rating + " out of 5";
+  if (state.rating === 1) t += " (Needs improvement)";
+  if (state.rating === 5) t += " (Excellent)";
+  return t;
+}
+function collectAnswers() {
+  var proto = { mode: state.protoMode, image: "", labels: document.getElementById("diagramLabels").value.trim() };
+  if (state.protoMode === "photo" && state.photoDataUrl) proto.image = state.photoDataUrl;
+  if (state.protoMode === "diagram" && diagramPad.hasDrawing()) proto.image = diagramPad.toData();
+  return {
+    criteria: collectCriteria(),
+    sketch: sketchPad.hasDrawing() ? sketchPad.toData() : "",
+    sketchNotes: document.getElementById("sketchNotes").value.trim(),
+    materials: collectMaterials(),
+    proto: proto,
+    reflectDiff: document.getElementById("reflectDiff").value.trim(),
+    reflectImprove: document.getElementById("reflectImprove").value.trim(),
+    rating: ratingText(),
+    testNotes: document.getElementById("testNotes").value.trim()
+  };
+}
+function blankOr(text) {
+  return text ? "<p>" + escapeHtml(text) + "</p>" : '<p class="blank">(left blank)</p>';
+}
+function imgOr(img, alt, blankMsg) {
+  return img ? '<img src="' + img + '" alt="' + alt + '">' : '<p class="blank">(' + blankMsg + ")</p>";
+}
+function summaryHtml(a) {
+  var html = "";
+  html += '<div class="answer"><h3>My design checklist</h3><ul class="plan-criteria">';
+  a.criteria.forEach(function (c) {
+    html += "<li>" + (c.met ? "&#9746;" : "&#9744;") + " " + escapeHtml(c.text) + "</li>";
+  });
+  html += "</ul></div>";
+  html += '<div class="answer"><h3>My brainstorm sketch</h3>' + imgOr(a.sketch, "My brainstorm sketch", "no sketch drawn") + "</div>";
+  html += '<div class="answer"><h3>My brainstorm notes</h3>' + blankOr(a.sketchNotes) + "</div>";
+  html += '<div class="answer"><h3>Materials I will use</h3>';
+  if (a.materials.length) {
+    html += "<ul>" + a.materials.map(function (m) { return "<li>" + escapeHtml(m) + "</li>"; }).join("") + "</ul>";
+  } else {
+    html += '<p class="blank">(no materials listed)</p>';
+  }
+  html += "</div>";
+  html += '<div class="answer"><h3>My prototype</h3>';
+  if (a.proto.mode === "photo") {
+    html += imgOr(a.proto.image, "Photo of my prototype", "no photo added yet");
+  } else if (a.proto.mode === "diagram") {
+    html += imgOr(a.proto.image, "My labelled prototype diagram", "no diagram drawn yet");
+    html += '<p style="margin-top:8px;"><strong>Labels:</strong></p>' + blankOr(a.proto.labels);
+  } else {
+    html += '<p class="blank">(not started yet)</p>';
+  }
+  html += "</div>";
+  html += '<div class="answer"><h3>How did your prototype differ from your original design?</h3>' + blankOr(a.reflectDiff) + "</div>";
+  html += '<div class="answer"><h3>What changes could you make to your prototype to improve it?</h3>' + blankOr(a.reflectImprove) + "</div>";
+  html += '<div class="answer"><h3>Rate your design</h3>' + (a.rating ? "<p>" + escapeHtml(a.rating) + "</p>" : '<p class="blank">(not rated)</p>') + "</div>";
+  html += '<div class="answer"><h3>What I noticed in the test</h3>' + blankOr(a.testNotes) + "</div>";
+  return html;
+}
+function summaryText(a) {
+  var lines = [document.title, document.querySelector(".subtitle").textContent, ""];
+  lines.push("My design checklist:");
+  a.criteria.forEach(function (c) { lines.push((c.met ? "[x] " : "[ ] ") + c.text); });
+  lines.push("");
+  lines.push("My brainstorm notes:");
+  lines.push(a.sketchNotes || "(left blank)");
+  lines.push(a.sketch ? "(My sketch is in the printed plan.)" : "(No sketch drawn.)");
+  lines.push("");
+  lines.push("Materials I will use:");
+  if (a.materials.length) { a.materials.forEach(function (m) { lines.push("- " + m); }); }
+  else { lines.push("(no materials listed)"); }
+  lines.push("");
+  if (a.proto.mode === "photo") {
+    lines.push("My prototype: photo" + (a.proto.image ? " (in the printed plan)" : " (no photo added yet)"));
+  } else if (a.proto.mode === "diagram") {
+    lines.push("My prototype: labelled diagram" + (a.proto.image ? " (in the printed plan)" : " (not drawn yet)"));
+    lines.push("Labels: " + (a.proto.labels || "(left blank)"));
+  } else {
+    lines.push("My prototype: (not started yet)");
+  }
+  lines.push("");
+  lines.push("How did your prototype differ from your original design?");
+  lines.push(a.reflectDiff || "(left blank)"); lines.push("");
+  lines.push("What changes could you make to your prototype to improve it?");
+  lines.push(a.reflectImprove || "(left blank)"); lines.push("");
+  lines.push("Rate your design: " + (a.rating || "(not rated)")); lines.push("");
+  lines.push("What I noticed in the test:");
+  lines.push(a.testNotes || "(left blank)");
+  return lines.join("\n");
+}
+
+function showSummary() {
+  var a = collectAnswers();
+  document.getElementById("answers").innerHTML = summaryHtml(a);
+  window.__lastSummaryText = summaryText(a);
+  document.getElementById("formView").classList.add("hidden");
+  document.getElementById("summaryView").classList.remove("hidden");
+  document.getElementById("summaryView").scrollIntoView();
+}
+function backToForm() {
+  document.getElementById("summaryView").classList.add("hidden");
+  document.getElementById("formView").classList.remove("hidden");
+  document.getElementById("formView").scrollIntoView();
+}
+function copyAnswers() {
+  var text = window.__lastSummaryText || "";
+  var done = function () {
+    document.getElementById("copyNote").textContent = "Copied. You can paste your design plan wherever you keep your work. Your pictures are in the printed plan.";
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { /* clipboard unavailable */ }
+  document.body.removeChild(ta);
+}
+
+addMat(""); addMat(""); addMat("");
+document.getElementById("addMat").addEventListener("click", function () { addMat(""); });
+document.getElementById("seePlan").addEventListener("click", showSummary);
+document.getElementById("backEdit").addEventListener("click", backToForm);
+document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+document.getElementById("copyBtn").addEventListener("click", copyAnswers);
+
+window.__APP = { state: state, collectAnswers: collectAnswers, summaryHtml: summaryHtml, summaryText: summaryText,
+  pads: { sketch: sketchPad, diagram: diagramPad }, addMat: addMat };
+</script>
+</body>
+</html>
